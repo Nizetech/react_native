@@ -1,20 +1,46 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View, Button } from "react-native";
+import { useState } from "react";
+import React from "react";
+import { StyleSheet, View, FlatList } from "react-native";
+import GoalItem from "./components/goal_item";
+import GoalInput from "./components/goal_input";
 
 export default function App() {
+  // This is a state variable that will store the list of goals as an array
+  const [courseGoals, setCourseGoals] = useState([]);
+
+  function addGoalHandler(enteredGoalText) {
+    setCourseGoals((currentGoals) => [
+      ...currentGoals,
+      { text: enteredGoalText, id: Math.random().toString() },
+    ]);
+  }
+
+  function deleteGoalHandler(goalId) {
+    setCourseGoals((currentGoals) => {
+      return currentGoals.filter((goal) => goal.id !== goalId);
+    });
+    console.log("deleteGoalHandler");
+  }
   return (
     <View style={styles.container}>
-      <Text style={textStyle.text}>Welcome to React Native</Text>
-      <Text style={styles.dummyText}>
-        Fortune building native application now This is my new React application
-      </Text>
-      <Button
-        color="green"
-        title="Click Me"
-        style={btnStyle.btn}
-        onPress={() => alert("Button Clicked")}
-      />
+      <GoalInput addGoalHandler={addGoalHandler} />
+      <View style={styles.goalsContainer}>
+        <FlatList
+          alwaysBounceVertical={true}
+          scrollsToTop={true}
+          data={courseGoals}
+          renderItem={(itemData) => (
+            <GoalItem
+              text={itemData.item.text}
+              id={itemData.item.id}
+              onDeleteItem={deleteGoalHandler}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+        ></FlatList>
+      </View>
+
       <StatusBar style="auto" />
     </View>
   );
@@ -22,32 +48,19 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 50,
+    paddingHorizontal: 16,
+    alignItems: "flex-start",
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
-  dummyText: {
-    margin: 40,
-    borderWidth: 2,
-    borderColor: "red",
-    padding: 20,
-    borderRadius: 10,
-    backgroundColor: "lightblue",
-    color: "red",
+  goalsContainer: {
+    flex: 5,
+    backgroundColor: "#f2f2f2",
+    padding: 10,
+    width: "100%",
+    alignItems: "start",
+    justifyContent: "flex-start",
   },
 });
 
-const textStyle = StyleSheet.create({
-  text: {
-    color: "red",
-    fontSize: 30,
-  },
-});
 
-const btnStyle = StyleSheet.create({
-  btn: {
-    color: "red",
-    borderRadius: 10,
-  },
-});
